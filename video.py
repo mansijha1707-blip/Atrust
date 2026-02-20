@@ -1,24 +1,24 @@
 from pathlib import Path
 import os
+
 import cv2
-import numpy as np
 import mediapipe as mp
+import numpy as np
+
+from ffmpeg import extract_frames
 
 try:
     import tensorflow as tf
-except ImportError:  # tensorflow is optional at runtime
+except ImportError:
     tf = None
 
-from ..utils.ffmpeg import extract_frames
-
-# native module (built from cpp/)
-
-import atrust_native  # type: ignore
+try:
+    import atrust_native  # type: ignore
+except ImportError:
+    atrust_native = None
 
 
 class XceptionDeepfakeDetector:
-    """Loads a fine-tuned Xception deepfake classifier and scores face crops."""
-
     def __init__(self, model_path: str | None = None):
         self.model_path = model_path or os.getenv("ATRUST_XCEPTION_MODEL_PATH", "models/xception_deepfake.keras")
         self.model = None
@@ -30,7 +30,7 @@ class XceptionDeepfakeDetector:
 
         try:
             self.model = tf.keras.models.load_model(self.model_path, compile=False)
-        except Exception as exc:  # model file may be absent/corrupt
+        except Exception as exc:
             self.error = f"model_load_failed:{type(exc).__name__}"
 
     @property
@@ -43,26 +43,36 @@ class XceptionDeepfakeDetector:
 
         rgb = cv2.cvtColor(face_bgr, cv2.COLOR_BGR2RGB)
         resized = cv2.resize(rgb, (299, 299), interpolation=cv2.INTER_AREA)
-        # Scale to [-1, 1] as expected by Xception preprocess
         x = tf.keras.applications.xception.preprocess_input(resized.astype(np.float32))
         x = np.expand_dims(x, axis=0)
 
         pred = self.model.predict(x, verbose=0)
         score = float(np.squeeze(pred))
-        # Model outputs can be logits/probabilities; normalize to [0,1]
         if score < 0.0 or score > 1.0:
             score = float(1.0 / (1.0 + np.exp(-score)))
         return max(0.0, min(1.0, score))
 
-def _artifact_score(img_bgr: np.ndarray) -> float:
-    # Simple heuristic examples: blur, edge inconsistency, compression artifacts proxy
-    gray = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2GRAY)
-    lap_var = cv2.Laplacian(gray, cv2.CV_64F).var()  # low => blurry
-    # normalize-ish
-    blur_score = max(0.0, min(1.0, (120.0 - lap_var) / 120.0))
-    return float(blur_score)
 
-def scan_video(video_path: Path, work_dir: Path, sample_fps: int = 2):␊
+def _artifact_score(img_bgr: np.ndarray) -> float:
+    gray = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2GRAY)
+    lap_var = cv2.Laplacian(gray, cv2.CV_64F).var()
+    return float(max(0.0, min(1.0, (120.0 - lap_var) / 120.0)))
+
+
+def _frame_metrics(img: np.ndarray) -> dict:
+    if atrust_native is not None and hasattr(atrust_native, "frame_metrics"):
+        return atrust_native.frame_metrics(img)
+
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    lap_var = cv2.Laplacian(gray, cv2.CV_64F).var()
+    return {
+        "blockiness": 0.0,
+        "noise": float(np.std(gray) / 255.0),
+        "sharpness": float(max(0.0, min(1.0, lap_var / 500.0))),
+    }
+
+
+def scan_video(video_path: Path, work_dir: Path, sample_fps: int = 2):
     frames_dir = work_dir / "frames"
     extract_frames(video_path, frames_dir, fps=sample_fps)
 
@@ -80,19 +90,13 @@ def scan_video(video_path: Path, work_dir: Path, sample_fps: int = 2):␊
         if img is None:
             continue
 
-        # Face detect (MediaPipe expects RGB)
         rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         det = mp_face.process(rgb)
-        faces = det.detections or []␊
-
-        if len(faces) == 0:
-            # Not automatically malicious; small penalty only if many
+        faces = det.detections or []
+        if not faces:
             continue
 
-        
-        # Native fast metrics
-        # returns dict: {"blockiness":..., "noise":..., "sharpness":...}
-        metrics = atrust_native.frame_metrics(img)  # numpy array -> C++
+        metrics = _frame_metrics(img)
 
         face_scores = []
         for face in faces:
@@ -106,15 +110,12 @@ def scan_video(video_path: Path, work_dir: Path, sample_fps: int = 2):␊
                 continue
 
             face_crop = img[y1:y2, x1:x2]
-            if face_crop.size == 0:
-                continue
-
-            face_scores.append(xception.predict_face_score(face_crop))
+            if face_crop.size:
+                face_scores.append(xception.predict_face_score(face_crop))
 
         xception_score = float(np.mean(face_scores)) if face_scores else 0.0
-
         art = _artifact_score(img)
-        # example combined suspicion
+
         suspicion = 0.0
         suspicion += 0.35 * float(metrics.get("blockiness", 0.0))
         suspicion += 0.15 * float(metrics.get("noise", 0.0))
@@ -129,26 +130,30 @@ def scan_video(video_path: Path, work_dir: Path, sample_fps: int = 2):␊
             if xception_score >= 0.5:
                 flags.append("video:xception_deepfake_high_confidence")
 
+    if atrust_native is None:
+        flags.append("video:native_metrics_unavailable")
     if not xception.is_ready:
         flags.append(f"video:xception_unavailable:{xception.error}")
 
     if suspicious:
-        evidence.append({
-            "pipeline": "video",
-            "type": "deepfake_suspected_segments",
-            "severity": 4 if len(suspicious) >= 3 else 3,
-            "details": {
-                "sample_fps": sample_fps,
-                "count": len(suspicious),
-                "xception_enabled": xception.is_ready,
-                "xception_model_path": xception.model_path,
-            },
-            "timestamps": suspicious
-        })
+        evidence.append(
+            {
+                "pipeline": "video",
+                "type": "deepfake_suspected_segments",
+                "severity": 4 if len(suspicious) >= 3 else 3,
+                "details": {
+                    "sample_fps": sample_fps,
+                    "count": len(suspicious),
+                    "xception_enabled": xception.is_ready,
+                    "xception_model_path": xception.model_path,
+                },
+                "timestamps": suspicious,
+            }
+        )
 
     return {
         "penalty": min(penalty, 60),
         "flags": flags,
         "evidence": evidence,
-        "summary": {"suspicious_segments": len(suspicious)}
+        "summary": {"suspicious_segments": len(suspicious)},
     }
