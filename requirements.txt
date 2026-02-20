@@ -12,4 +12,8 @@ pillow==10.4.0
 # MediaPipe is heavy but works on Windows via pip for many setups
 mediapipe==0.10.14
 
+# Optional: required to run Xception deepfake model scoring for videos
+tensorflow==2.17.0
+
 # Your pybind11 module will be built into a .pyd and imported as atrust_native
+
