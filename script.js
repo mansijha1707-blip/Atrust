@@ -1,6 +1,4 @@
-// =============================================
 // Atrust – Frontend ↔ Backend Integration
-// =============================================
 
 const API_BASE = "http://127.0.0.1:8000";
 
@@ -9,65 +7,33 @@ document.addEventListener("DOMContentLoaded", () => {
   const closeBtn    = document.getElementById("closeModal");
   const actionCards = document.querySelectorAll(".action-card");
   const fileInput   = document.getElementById("mediaFile");
-  const submitBtn   = document.querySelector(".submit-btn");
-  const modalTitle  = document.querySelector(".modal-header h2");
-  const uploadForm  = document.querySelector(".upload-form");
+  const fileSection = document.getElementById("fileSection");
+  const textSection = document.getElementById("textSection");
+  const textInput   = document.getElementById("textInput");
+  const submitBtn   = document.getElementById("submitBtn");
+  const modalTitle  = document.getElementById("modalTitle");
+  const resultBox   = document.getElementById("resultBox");
 
-  let currentMediaType = ""; // tracks which card was clicked
+  let currentMediaType = "";
 
-  // ── Create result box inside modal ──────────────────────────────
-  const resultBox = document.createElement("div");
-  resultBox.id = "resultBox";
-  resultBox.style.cssText = `
-    margin-top: 20px;
-    padding: 16px;
-    border-radius: 10px;
-    font-family: Inter, sans-serif;
-    font-size: 14px;
-    display: none;
-  `;
-  uploadForm.appendChild(resultBox);
-
-  // ── Text input box (shown only for Text card) ────────────────────
-  const textArea = document.createElement("textarea");
-  textArea.id = "textInput";
-  textArea.placeholder = "Paste your suspicious message here...";
-  textArea.style.cssText = `
-    width: 100%;
-    height: 100px;
-    margin-top: 10px;
-    padding: 10px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    font-family: Inter, sans-serif;
-    font-size: 14px;
-    resize: vertical;
-    display: none;
-    box-sizing: border-box;
-  `;
-  uploadForm.insertBefore(textArea, submitBtn);
-
-  // ── Open modal when card is clicked ─────────────────────────────
+  // ── Open modal ───────────────────────────────────────────────────
   actionCards.forEach(card => {
     card.addEventListener("click", () => {
-      currentMediaType = card.getAttribute("data-media"); // Video / Audio / Image / Text
+      currentMediaType = card.getAttribute("data-media");
       modalTitle.textContent = `Check ${currentMediaType}`;
       resultBox.style.display = "none";
       resultBox.innerHTML = "";
       fileInput.value = "";
-      textArea.value = "";
-      submitBtn.disabled = true;
+      textInput.value = "";
 
-      // Show text area for Text, file input for others
       if (currentMediaType === "Text") {
-        fileInput.parentElement.style.display = "none";
-        textArea.style.display = "block";
+        fileSection.style.display = "none";
+        textSection.style.display = "block";
         submitBtn.disabled = false;
       } else {
-        fileInput.parentElement.style.display = "block";
-        textArea.style.display = "none";
-
-        // Set accepted file types
+        fileSection.style.display = "block";
+        textSection.style.display = "none";
+        submitBtn.disabled = true;
         if (currentMediaType === "Video")      fileInput.accept = "video/*";
         else if (currentMediaType === "Audio") fileInput.accept = "audio/*";
         else if (currentMediaType === "Image") fileInput.accept = "image/*";
@@ -77,70 +43,48 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // ── Enable submit when file selected ────────────────────────────
   fileInput.addEventListener("change", () => {
     submitBtn.disabled = !fileInput.files.length;
   });
 
-  // ── Close modal ──────────────────────────────────────────────────
   closeBtn.addEventListener("click", () => modal.setAttribute("hidden", true));
   modal.addEventListener("click", (e) => {
     if (e.target === modal) modal.setAttribute("hidden", true);
   });
 
-  // ── Submit — send to backend ─────────────────────────────────────
+  // ── Submit ───────────────────────────────────────────────────────
   submitBtn.addEventListener("click", async (e) => {
     e.preventDefault();
-
-    // Show loading state
     submitBtn.disabled = true;
     submitBtn.textContent = "Analyzing...";
     resultBox.style.display = "none";
-    resultBox.innerHTML = "";
 
     try {
       let data;
 
       if (currentMediaType === "Text") {
-        // ── Text analysis ──────────────────────────────────────────
-        const message = textArea.value.trim();
-        if (!message) {
-          showError("Please enter a message to analyze.");
-          return;
-        }
+        const message = textInput.value.trim();
+        if (!message) { showError("Please enter a message."); return; }
         const form = new FormData();
         form.append("text", message);
-        const res = await fetch(`${API_BASE}/analyze/text`, {
-          method: "POST",
-          body: form,
-        });
+        const res = await fetch(`${API_BASE}/scan/text`, { method: "POST", body: form });
+        if (!res.ok) throw new Error(res.status);
         data = await res.json();
-
       } else {
-        // ── File analysis (Video / Audio / Image) ──────────────────
         const file = fileInput.files[0];
-        if (!file) {
-          showError("Please select a file.");
-          return;
-        }
+        if (!file) { showError("Please select a file."); return; }
         const form = new FormData();
         form.append("file", file);
-
-        const endpoint =
-          currentMediaType === "Video" ? "video" :
-          currentMediaType === "Audio" ? "audio" : "image";
-
-        const res = await fetch(`${API_BASE}/analyze/${endpoint}`, {
-          method: "POST",
-          body: form,
-        });
+        const endpoint = currentMediaType === "Video" ? "video" : currentMediaType === "Audio" ? "audio" : "image";
+        const res = await fetch(`${API_BASE}/scan/${endpoint}`, { method: "POST", body: form });
+        if (!res.ok) throw new Error(res.status);
         data = await res.json();
       }
 
       showResult(data);
 
     } catch (err) {
-      showError("Could not connect to the backend. Make sure the server is running.");
+      showError("Could not connect to backend. Make sure the server is running.");
       console.error(err);
     } finally {
       submitBtn.disabled = false;
@@ -148,81 +92,40 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // ── Display result ───────────────────────────────────────────────
+  // ── Show result ──────────────────────────────────────────────────
   function showResult(data) {
-    const isSafe   = data.status === "authentic" || data.status === "safe";
-    const percent  = Math.round((data.confidence || 0) * 100);
+    const riskType = data.risk_type || "critical";
+    const isSafe   = riskType === "low" || riskType === "medium";
+    const score    = Math.round(data.trust_score || 0);
     const color    = isSafe ? "#16a34a" : "#dc2626";
     const bgColor  = isSafe ? "#f0fdf4" : "#fef2f2";
-    const emoji    = isSafe ? "✅" : "🚨";
-    const label    = data.status?.replace("_", " ").toUpperCase();
+    const label    = riskType.replace("_", " ").toUpperCase();
 
-    // Build details rows
-    let detailsHTML = "";
-    if (data.details) {
-      const skip = ["detected_keywords"];
-      Object.entries(data.details).forEach(([key, val]) => {
-        if (skip.includes(key)) return;
-        const label = key.replace(/_/g, " ");
-        const pct   = Math.round(val * 100);
-        detailsHTML += `
-          <div style="margin-bottom:8px;">
-            <div style="display:flex;justify-content:space-between;margin-bottom:3px;">
-              <span style="text-transform:capitalize;">${label}</span>
-              <span style="font-weight:600;">${pct}%</span>
-            </div>
-            <div style="background:#e5e7eb;border-radius:999px;height:6px;">
-              <div style="background:${color};width:${pct}%;height:6px;border-radius:999px;"></div>
-            </div>
-          </div>`;
-      });
+    // Circle parameters
+    const radius = 54;
+    const circumference = 2 * Math.PI * radius;
+    const offset = circumference - (score / 100) * circumference;
 
-      // Show detected keywords for text
-      if (data.details.detected_keywords?.length) {
-        const tags = data.details.detected_keywords
-          .map(kw => `<span style="background:#fee2e2;color:#dc2626;padding:2px 8px;border-radius:999px;font-size:12px;margin:2px;display:inline-block;">${kw}</span>`)
-          .join("");
-        detailsHTML += `<div style="margin-top:10px;"><strong>Detected keywords:</strong><br/>${tags}</div>`;
-      }
-    }
-
-    resultBox.style.cssText = `
-      margin-top: 20px;
-      padding: 16px;
-      border-radius: 10px;
-      font-family: Inter, sans-serif;
-      font-size: 14px;
-      background: ${bgColor};
-      border: 1.5px solid ${color};
-      display: block;
-    `;
-
+    resultBox.style.cssText = `display:block;margin-top:20px;padding:20px;border-radius:12px;font-family:Inter,sans-serif;font-size:14px;background:${bgColor};border:1.5px solid ${color};text-align:center;`;
     resultBox.innerHTML = `
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-        <span style="font-size:24px;">${emoji}</span>
-        <div>
-          <div style="font-size:18px;font-weight:700;color:${color};">${label}</div>
-          <div style="color:#6b7280;">Confidence: <strong>${percent}%</strong></div>
-        </div>
-      </div>
-      <p style="color:#374151;margin-bottom:14px;">${data.summary}</p>
-      ${detailsHTML}
+      <svg width="140" height="140" viewBox="0 0 140 140" style="display:block;margin:0 auto 12px;">
+        <circle cx="70" cy="70" r="${radius}" fill="none" stroke="#e5e7eb" stroke-width="12"/>
+        <circle cx="70" cy="70" r="${radius}" fill="none" stroke="${color}" stroke-width="12"
+          stroke-dasharray="${circumference}" stroke-dashoffset="${offset}"
+          stroke-linecap="round"
+          transform="rotate(-90 70 70)"
+          style="transition: stroke-dashoffset 0.8s ease;"/>
+        <text x="70" y="65" text-anchor="middle" font-size="28" font-weight="700" fill="${color}" font-family="Inter,sans-serif">${score}</text>
+        <text x="70" y="85" text-anchor="middle" font-size="12" fill="#6b7280" font-family="Inter,sans-serif">Trust Score</text>
+      </svg>
+      <div style="font-size:20px;font-weight:700;color:${color};margin-bottom:8px;">${label}</div>
+      <div style="color:#374151;font-size:14px;">${data.recommended_action || ""}</div>
     `;
   }
 
-  // ── Display error ────────────────────────────────────────────────
+  // ── Show error ───────────────────────────────────────────────────
   function showError(message) {
-    resultBox.style.cssText = `
-      margin-top: 20px;
-      padding: 16px;
-      border-radius: 10px;
-      font-family: Inter, sans-serif;
-      font-size: 14px;
-      background: #fef2f2;
-      border: 1.5px solid #dc2626;
-      display: block;
-      color: #dc2626;
-    `;
+    resultBox.style.cssText = "display:block;margin-top:20px;padding:16px;border-radius:10px;background:#fef2f2;border:1.5px solid #dc2626;color:#dc2626;font-family:Inter,sans-serif;font-size:14px;";
     resultBox.innerHTML = `⚠️ ${message}`;
   }
 });
