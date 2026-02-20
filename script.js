@@ -1,56 +1,69 @@
-document.addEventListener('DOMContentLoaded', () => {
-  const navToggle = document.querySelector('.nav-toggle');
-  const navMenu = document.getElementById('nav-menu');
-  const cards = document.querySelectorAll('.action-card');
-  const modal = document.getElementById('uploadModal');
-  const modalTitle = document.getElementById('modalTitle');
-  const closeModalBtn = document.getElementById('closeModal');
-  const uploadForm = document.querySelector('.upload-form');
-  const loading = document.getElementById('loading');
-  const idleMessage = document.getElementById('idleMessage');
-  const scoreValue = document.getElementById('scoreValue');
-  const progressFill = document.getElementById('progressFill');
+// Wait until DOM is fully loaded
+document.addEventListener("DOMContentLoaded", () => {
 
-  navToggle?.addEventListener('click', () => {
-    const isOpen = navMenu.classList.toggle('open');
-    navToggle.setAttribute('aria-expanded', String(isOpen));
-  });
+  const modal = document.getElementById("uploadModal");
+  const closeBtn = document.getElementById("closeModal");
+  const actionCards = document.querySelectorAll(".action-card");
+  const fileInput = document.getElementById("mediaFile");
+  const submitBtn = document.querySelector(".submit-btn");
 
-  cards.forEach((card) => {
-    card.addEventListener('click', () => {
-      const mediaType = card.dataset.media || 'Media';
-      modalTitle.textContent = `Upload ${mediaType} File`;
-      modal.hidden = false;
+  // ===== Modal Open =====
+  if (actionCards.length && modal) {
+    actionCards.forEach(card => {
+      card.addEventListener("click", () => {
+        modal.removeAttribute("hidden");
+      });
     });
-  });
+  }
 
-  closeModalBtn?.addEventListener('click', () => {
-    modal.hidden = true;
-  });
+  // ===== Modal Close (X button) =====
+  if (closeBtn && modal) {
+    closeBtn.addEventListener("click", () => {
+      modal.setAttribute("hidden", true);
+    });
+  }
 
-  modal?.addEventListener('click', (event) => {
-    if (event.target === modal) {
-      modal.hidden = true;
-    }
-  });
+  // ===== Close when clicking outside modal =====
+  if (modal) {
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) {
+        modal.setAttribute("hidden", true);
+      }
+    });
+  }
 
-  uploadForm?.addEventListener('submit', (event) => {
-    event.preventDefault();
-    modal.hidden = true;
-    idleMessage.hidden = true;
-    loading.hidden = false;
+  // ===== Disable button until file selected =====
+  if (fileInput && submitBtn) {
+    submitBtn.disabled = true;
 
-    window.setTimeout(() => {
-      loading.hidden = true;
-      idleMessage.hidden = false;
-      idleMessage.textContent = 'Analysis complete. Review your updated trust score below.';
-      const simulatedScore = 91;
-      scoreValue.textContent = `${simulatedScore}%`;
-      progressFill.style.width = `${simulatedScore}%`;
-      document.querySelector('.progress')?.setAttribute(
-        'aria-label',
-        `Trust score progress bar showing ${simulatedScore} percent confidence`
-      );
-    }, 1400);
-  });
+    fileInput.addEventListener("change", () => {
+      submitBtn.disabled = !fileInput.files.length;
+    });
+  }
+
+  // ===== Optional: Fake Verification Animation =====
+  const scoreValue = document.getElementById("scoreValue");
+  const progressFill = document.getElementById("progressFill");
+
+  if (submitBtn && scoreValue && progressFill) {
+    submitBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+
+      let score = 0;
+      const target = Math.floor(Math.random() * 40) + 60; // random 60–100%
+
+      const interval = setInterval(() => {
+        if (score >= target) {
+          clearInterval(interval);
+        } else {
+          score++;
+          scoreValue.textContent = score + "%";
+          progressFill.style.width = score + "%";
+        }
+      }, 15);
+
+      modal.setAttribute("hidden", true);
+    });
+  }
+
 });
