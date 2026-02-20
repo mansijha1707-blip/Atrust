@@ -1,22 +1,251 @@
-.about-section {
-    background-color: #f8f9fa;
-    padding: 20px;
-    border-radius: 5px;
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-.about-content {
-    color: #212529;
-    font-size: 1.2em;
+/* Body Background (LIGHT BLUE, VISIBLE 100%) */
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: #a8d0e6; /* light blue YOU WILL SEE */
+  color: #0f172a;
+  min-height: 100vh;
 }
 
-.features-list {
-    list-style-type: none;
-    padding: 0;
+/* Header */
+.site-header {
+  background: rgba(255, 255, 255, 0.6); /* transparent so background shows */
+  backdrop-filter: blur(10px);
+  padding: 18px 40px;
+  border-bottom: 1px solid rgba(0,0,0,0.1);
 }
 
-.feature-item {
-    background-color: #e9ecef;
-    margin: 10px 0;
-    padding: 15px;
-    border-radius: 3px;
+/* Navbar */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.brand {
+  font-weight: 600;
+  font-size: 20px;
+  color: #0f172a;
+  text-decoration: none;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 28px;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: #1e293b;
+  font-weight: 500;
+  transition: 0.2s ease;
+}
+
+.nav-links a:hover {
+  color: #0f172a;
+}
+
+/* Main Content */
+.main-content {
+  padding: 60px 40px;
+  max-width: 1100px;
+  margin: auto;
+
+  /* FULLY TRANSPARENT */
+  background: transparent;
+}
+
+/* Hero Section */
+.hero {
+  text-align: center;
+  margin-bottom: 60px;
+  background: transparent;
+}
+
+.hero-kicker {
+  color: #3b82f6;
+  font-size: 14px;
+  margin-bottom: 12px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.hero h1 {
+  font-size: 42px;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.hero-subtitle {
+  color: #1e293b;
+  max-width: 650px;
+  margin: auto;
+  line-height: 1.6;
+}
+
+/* Card Grid */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 25px;
+  background: transparent;
+}
+
+/* Action Cards */
+.action-card {
+  background: rgba(255, 255, 255, 0.35); /* LIGHT, TRANSPARENT */
+  border: 1px solid rgba(0,0,0,0.15);
+  padding: 30px;
+  border-radius: 18px;
+  cursor: pointer;
+  transition: 0.3s ease;
+  text-align: left;
+  backdrop-filter: blur(10px);
+  color: #0f172a;
+}
+
+.action-card:hover {
+  transform: translateY(-6px);
+  border-color: #3b82f6;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+}
+
+.card-icon {
+  font-size: 28px;
+  margin-bottom: 12px;
+  display: block;
+}
+
+.card-title {
+  font-weight: 600;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.card-description {
+  font-size: 14px;
+  color: #1e293b;
+}
+
+/* Modal */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+}
+
+.modal[hidden] {
+  display: none;
+}
+
+.modal-content {
+  background: rgba(255,255,255,0.9);
+  color: #0f172a;
+  width: 420px;
+  padding: 30px;
+  border-radius: 16px;
+  animation: fadeIn 0.25s ease-out;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: #1e293b;
+  font-size: 20px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.close-btn:hover {
+  color: #0f172a;
+}
+
+/* Upload Form */
+.upload-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.upload-form input {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(0,0,0,0.2);
+  background: #e3f3ff;
+  color: #0f172a;
+}
+
+.submit-btn {
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  background: #3b82f6;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.submit-btn:disabled {
+  background: #94a3b8;
+  cursor: not-allowed;
+}
+
+.submit-btn:hover:not(:disabled) {
+  background: #2563eb;
+}
+
+/* Score Section */
+.score-section {
+  margin-top: 40px;
+  text-align: center;
+}
+
+.score-value {
+  font-size: 40px;
+  font-weight: 700;
+  margin-bottom: 15px;
+}
+
+.progress-bar {
+  width: 100%;
+  background: rgba(0,0,0,0.15);
+  height: 12px;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  width: 0%;
+  background: #3b82f6;
+  transition: width 0.3s ease;
 }
