@@ -1,1 +1,39 @@
-<!DOCTYPE html>\n<html lang="en">\n<head>\n    <meta charset="UTF-8">\n    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n    <title>Atrust Dashboard</title>\n    <link rel="stylesheet" href="styles.css">\n</head>\n<body>\n    <header>\n        <nav>\n            <ul>\n                <li><a href="#dashboard">Dashboard</a></li>\n                <li><a href="#scores">Trust Scores</a></li>\n                <li><a href="#settings">Settings</a></li>\n            </ul>\n        </nav>\n    </header>\n    <main>\n        <section id="dashboard">\n            <h1>Welcome to Atrust Dashboard</h1>\n            <div class="card">\n                <h2>Trust Score</h2>\n                <p>Your current trust score is: <span id="trust-score">85%</span></p>\n                <button onclick="showModal()">View Details</button>\n            </div>\n        </section>\n        <section id="scores">\n            <h2>Trust Scores Overview</h2>\n            <div class="card">\n                <p>...</p>\n            </div>\n        </section>\n    </main>\n    <div id="modal" class="modal">\n        <div class="modal-content">\n            <span class="close" onclick="closeModal()">&times;</span>\n            <h2>Trust Score Details</h2>\n            <p>Details about your trust score...</p>\n        </div>\n    </div>\n    <script src="script.js"></script>\n    <script>\n        function showModal() {\n            document.getElementById('modal').style.display = 'block';\n        }\n        function closeModal() {\n            document.getElementById('modal').style.display = 'none';\n        }\n    <\/script>\n</body>\n</html>
+<!DOCTYPE html>\n<html lang="en">\n<head>\n    
+<meta charset="UTF-8">\n    
+<meta name="viewport" content="width=device-width, initial-scale=1.0">\n    
+  <title>Atrust Dashboard</title>\n    
+  <link rel="stylesheet" href="styles.css">\n</head>\n<body>\n    
+    <header>\n        
+      <nav>\n            
+        <ul>\n                
+          <li><a href="#dashboard">Dashboard</a></li>\n                
+          <li><a href="#scores">Trust Scores</a></li>\n                
+          <li><a href="#settings">Settings</a></li>\n            
+        </ul>\n        
+      </nav>\n    
+    </header>\n    
+    <main>\n        
+      <section id="dashboard">\n            
+        <h1>Welcome to Atrust Dashboard</h1>\n            
+        <div class="card">\n                
+          <h2>Trust Score</h2>\n                
+          <p>Your current trust score is: <span id="trust-score">85%</span></p>\n                
+          <button onclick="showModal()">View Details</button>\n            
+        </div>\n        
+      </section>\n        <section id="scores">\n            
+        <h2>Trust Scores Overview</h2>\n            
+        <div class="card">\n                
+          <p>...</p>\n            
+        </div>\n        
+      </section>\n    
+    </main>\n    
+    <div id="modal" class="modal">\n        <div class="modal-content">\n            
+      <span class="close" onclick="closeModal()">&times;</span>\n            
+      <h2>Trust Score Details</h2>\n            
+      <p>Details about your trust score...</p>\n        
+    </div>\n    </div>\n    
+    <script src="script.js"></script>\n    
+    <script>\n        
+  function showModal() {\n            document.getElementById('modal').style.display = 'block';\n        }\n        
+    function closeModal() {\n            document.getElementById('modal').style.display = 'none';\n        }\n    
+      <\/script>\n</body>\n</html>
