@@ -5,10 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Atrust - Digital Trust Dashboard</title>
 
+  <!-- Google Font -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
+  <!-- Main Styles -->
   <link rel="stylesheet" href="styles.css" />
 </head>
 
@@ -17,26 +19,23 @@
   <!-- Navigation -->
   <header class="site-header">
     <nav class="navbar">
-      <a class="brand" href="#dashboard">
+      <a class="brand" href="index.html">
         <span class="brand-mark">🛡️</span>
         <span>Atrust</span>
       </a>
 
-      <button class="nav-toggle" aria-expanded="false">☰</button>
-
-      <ul id="nav-menu" class="nav-links">
-        <li><a href="#dashboard">Dashboard</a></li>
-        <li><a href="#reports">Reports</a></li>
-        <li><a href="#about">About</a></li>
+      <ul class="nav-links">
+        <li><a href="index.html">Dashboard</a></li>
+        <li><a href="reports.html">Reports</a></li>
+        <li><a href="about.html">About</a></li>
       </ul>
-
-      <button class="profile-btn">Profile / Login</button>
     </nav>
   </header>
 
   <!-- Main Content -->
-  <main id="dashboard" class="main-content">
+  <main class="main-content">
 
+    <!-- Hero Section -->
     <section class="hero">
       <p class="hero-kicker">Cyber Integrity Platform</p>
       <h1>Atrust – Real-Time Digital Trust Verification</h1>
@@ -45,7 +44,9 @@
       </p>
     </section>
 
+    <!-- Action Cards -->
     <section class="card-grid">
+
       <button class="action-card" data-media="Video">
         <span class="card-icon">🎬</span>
         <span class="card-title">Check Video</span>
@@ -69,25 +70,7 @@
         <span class="card-title">Check Image</span>
         <span class="card-description">Detect editing traces and inconsistencies.</span>
       </button>
-    </section>
 
-    <section id="reports" class="panel">
-      <h2>Trust Score</h2>
-      <div class="score-row">
-        <span>Confidence</span>
-        <span id="scoreValue" class="score-value">78%</span>
-      </div>
-      <div class="progress">
-        <div id="progressFill" class="progress-fill" style="width: 78%"></div>
-      </div>
-    </section>
-
-    <section id="about" class="panel">
-      <h2>About Atrust</h2>
-      <p>
-        Atrust provides a verification workflow for digital media,
-        helping teams build confidence in every interaction.
-      </p>
     </section>
 
   </main>
@@ -96,9 +79,10 @@
   <div class="modal" id="uploadModal" hidden>
     <div class="modal-content">
       <div class="modal-header">
-        <h2 id="modalTitle">Upload File</h2>
+        <h2>Upload File</h2>
         <button id="closeModal" class="close-btn">✕</button>
       </div>
+
       <form class="upload-form">
         <label for="mediaFile">Choose file</label>
         <input id="mediaFile" type="file" />
@@ -107,6 +91,7 @@
     </div>
   </div>
 
+  <!-- Script -->
   <script src="script.js"></script>
 
 </body>
