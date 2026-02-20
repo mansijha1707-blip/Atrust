@@ -1,7 +1,9 @@
 from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from pathlib import Path
-import tempfile
+import sys, os, tempfile
+
+sys.path.insert(0, os.path.dirname(__file__))
 
 from files import save_upload
 from text import scan_text
@@ -17,6 +19,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.get("/")
+def root():
+    return {"status": "ok", "message": "Atrust API is running!"}
+
 @app.get("/health")
 def health():
     return {"ok": True}
@@ -24,7 +30,6 @@ def health():
 @app.post("/scan/video")
 def scan_video_ep(file: UploadFile = File(...)):
     from video import scan_video
-
     path = save_upload(file.file, suffix=Path(file.filename).suffix or ".mp4")
     with tempfile.TemporaryDirectory() as td:
         results = {"video": scan_video(path, Path(td))}
@@ -33,7 +38,6 @@ def scan_video_ep(file: UploadFile = File(...)):
 @app.post("/scan/image")
 def scan_image_ep(file: UploadFile = File(...)):
     from image import scan_image
-
     path = save_upload(file.file, suffix=Path(file.filename).suffix or ".jpg")
     results = {"image": scan_image(path)}
     return build_trust_report(results).model_dump()
@@ -41,7 +45,6 @@ def scan_image_ep(file: UploadFile = File(...)):
 @app.post("/scan/audio")
 def scan_audio_ep(file: UploadFile = File(...)):
     from audio import scan_audio
-
     path = save_upload(file.file, suffix=Path(file.filename).suffix or ".wav")
     results = {"audio": scan_audio(path)}
     return build_trust_report(results).model_dump()
@@ -61,21 +64,17 @@ def scan_unified(
     results = {}
     if video:
         from video import scan_video
-
         vpath = save_upload(video.file, suffix=Path(video.filename).suffix or ".mp4")
         with tempfile.TemporaryDirectory() as td:
             results["video"] = scan_video(vpath, Path(td))
     if image:
         from image import scan_image
-
         ipath = save_upload(image.file, suffix=Path(image.filename).suffix or ".jpg")
         results["image"] = scan_image(ipath)
     if audio:
         from audio import scan_audio
-
         apath = save_upload(audio.file, suffix=Path(audio.filename).suffix or ".wav")
         results["audio"] = scan_audio(apath)
     if text:
         results["text"] = scan_text(text)
-
     return build_trust_report(results).model_dump()
