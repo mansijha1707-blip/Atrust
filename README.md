@@ -152,6 +152,7 @@ Every scan returns a **Trust Score** from 0–100:
 ## 👥 Contributors
 
 - [mansijha1707-blip](https://github.com/mansijha1707-blip)
+- [mahirahaque](https://github.com/mahirahaque)
 
 ---
 
