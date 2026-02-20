@@ -96,7 +96,7 @@ Interactive API docs: **http://127.0.0.1:8000/docs**
 ```
 <img width="1919" height="869" alt="image" src="https://github.com/user-attachments/assets/40867dcc-bb5f-4328-b765-c295dea5f71b" />
 
-<img width="833" height="756" alt="image" src="https://github.com/user-attachments/assets/543a4ab7-401b-4279-a43b-033dcc2afcd9" />
+<img width="1919" height="872" alt="image" src="https://github.com/user-attachments/assets/85b216f4-ae01-4d7c-9173-9d50ac1b71d1" />
 
 
 ---
