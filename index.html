@@ -4,37 +4,28 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Atrust - Digital Trust Dashboard</title>
-
-  <!-- Google Font -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-
-  <!-- Main Styles -->
   <link rel="stylesheet" href="styles.css" />
 </head>
-
 <body>
-
   <!-- Navigation -->
   <header class="site-header">
     <nav class="navbar">
-      <a class="brand" href="index.html">
+      <a class="brand" href="/">
         <span class="brand-mark">🛡️</span>
         <span>Atrust</span>
       </a>
-
       <ul class="nav-links">
-        <li><a href="index.html">Dashboard</a></li>
-        <li><a href="about.html">About</a></li>
+        <li><a href="/">Dashboard</a></li>
+        <li><a href="/about">About</a></li>
       </ul>
     </nav>
   </header>
 
   <!-- Main Content -->
   <main class="main-content">
-
-    <!-- Hero Section -->
     <section class="hero">
       <p class="hero-kicker">Cyber Integrity Platform</p>
       <h1>Atrust – Real-Time Digital Trust Verification</h1>
@@ -45,53 +36,56 @@
 
     <!-- Action Cards -->
     <section class="card-grid">
-
       <button class="action-card" data-media="Video">
         <span class="card-icon">🎬</span>
         <span class="card-title">Check Video</span>
         <span class="card-description">Analyze motion and frame authenticity.</span>
       </button>
-
       <button class="action-card" data-media="Audio">
         <span class="card-icon">🎧</span>
         <span class="card-title">Check Audio</span>
         <span class="card-description">Inspect voice patterns for synthetic artifacts.</span>
       </button>
-
       <button class="action-card" data-media="Text">
         <span class="card-icon">📝</span>
         <span class="card-title">Check Text</span>
         <span class="card-description">Flag spam and generated tone.</span>
       </button>
-
       <button class="action-card" data-media="Image">
         <span class="card-icon">🖼️</span>
         <span class="card-title">Check Image</span>
         <span class="card-description">Detect editing traces and inconsistencies.</span>
       </button>
-
     </section>
-
   </main>
 
   <!-- Upload Modal -->
   <div class="modal" id="uploadModal" hidden>
     <div class="modal-content">
       <div class="modal-header">
-        <h2>Upload File</h2>
+        <h2 id="modalTitle">Upload File</h2>
         <button id="closeModal" class="close-btn">✕</button>
       </div>
 
-      <form class="upload-form">
+      <!-- File input (for video/audio/image) -->
+      <div id="fileSection">
         <label for="mediaFile">Choose file</label>
         <input id="mediaFile" type="file" />
-        <button type="submit" class="submit-btn">Start Verification</button>
-      </form>
+      </div>
+
+      <!-- Text input (for text analysis) -->
+      <div id="textSection" style="display:none;">
+        <label for="textInput">Paste your message</label>
+        <textarea id="textInput" rows="4" placeholder="Paste suspicious message here..." style="width:100%;padding:10px;margin-top:6px;border-radius:8px;border:1px solid #ccc;font-family:Inter,sans-serif;font-size:14px;resize:vertical;box-sizing:border-box;"></textarea>
+      </div>
+
+      <button id="submitBtn" class="submit-btn" style="margin-top:16px;">Start Verification</button>
+
+      <!-- Result -->
+      <div id="resultBox" style="display:none;margin-top:20px;"></div>
     </div>
   </div>
 
-  <!-- Script -->
-  <script type="module" src="script.js"></script>
-
+  <script src="script.js"></script>
 </body>
 </html>
