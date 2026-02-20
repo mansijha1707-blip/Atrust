@@ -1,4 +1,91 @@
-if (e.target === modal) modal.setAttribute("hidden", true);
+// =============================================
+// Atrust – Frontend ↔ Backend Integration
+// =============================================
+
+const API_BASE = "http://127.0.0.1:8000";
+
+document.addEventListener("DOMContentLoaded", () => {
+  const modal       = document.getElementById("uploadModal");
+  const closeBtn    = document.getElementById("closeModal");
+  const actionCards = document.querySelectorAll(".action-card");
+  const fileInput   = document.getElementById("mediaFile");
+  const submitBtn   = document.querySelector(".submit-btn");
+  const modalTitle  = document.querySelector(".modal-header h2");
+  const uploadForm  = document.querySelector(".upload-form");
+
+  let currentMediaType = ""; // tracks which card was clicked
+
+  // ── Create result box inside modal ──────────────────────────────
+  const resultBox = document.createElement("div");
+  resultBox.id = "resultBox";
+  resultBox.style.cssText = `
+    margin-top: 20px;
+    padding: 16px;
+    border-radius: 10px;
+    font-family: Inter, sans-serif;
+    font-size: 14px;
+    display: none;
+  `;
+  uploadForm.appendChild(resultBox);
+
+  // ── Text input box (shown only for Text card) ────────────────────
+  const textArea = document.createElement("textarea");
+  textArea.id = "textInput";
+  textArea.placeholder = "Paste your suspicious message here...";
+  textArea.style.cssText = `
+    width: 100%;
+    height: 100px;
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-family: Inter, sans-serif;
+    font-size: 14px;
+    resize: vertical;
+    display: none;
+    box-sizing: border-box;
+  `;
+  uploadForm.insertBefore(textArea, submitBtn);
+
+  // ── Open modal when card is clicked ─────────────────────────────
+  actionCards.forEach(card => {
+    card.addEventListener("click", () => {
+      currentMediaType = card.getAttribute("data-media"); // Video / Audio / Image / Text
+      modalTitle.textContent = `Check ${currentMediaType}`;
+      resultBox.style.display = "none";
+      resultBox.innerHTML = "";
+      fileInput.value = "";
+      textArea.value = "";
+      submitBtn.disabled = true;
+
+      // Show text area for Text, file input for others
+      if (currentMediaType === "Text") {
+        fileInput.parentElement.style.display = "none";
+        textArea.style.display = "block";
+        submitBtn.disabled = false;
+      } else {
+        fileInput.parentElement.style.display = "block";
+        textArea.style.display = "none";
+
+        // Set accepted file types
+        if (currentMediaType === "Video")      fileInput.accept = "video/*";
+        else if (currentMediaType === "Audio") fileInput.accept = "audio/*";
+        else if (currentMediaType === "Image") fileInput.accept = "image/*";
+      }
+
+      modal.removeAttribute("hidden");
+    });
+  });
+
+  // ── Enable submit when file selected ────────────────────────────
+  fileInput.addEventListener("change", () => {
+    submitBtn.disabled = !fileInput.files.length;
+  });
+
+  // ── Close modal ──────────────────────────────────────────────────
+  closeBtn.addEventListener("click", () => modal.setAttribute("hidden", true));
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) modal.setAttribute("hidden", true);
   });
 
   // ── Submit — send to backend ─────────────────────────────────────
@@ -23,12 +110,10 @@ if (e.target === modal) modal.setAttribute("hidden", true);
         }
         const form = new FormData();
         form.append("text", message);
-        
-        const res = await fetch(`${API_BASE}/scan/text`, {
+        const res = await fetch(`${API_BASE}/analyze/text`, {
           method: "POST",
           body: form,
         });
-        if (!res.ok) throw new Error(`Request failed: ${res.status}`);
         data = await res.json();
 
       } else {
@@ -45,17 +130,14 @@ if (e.target === modal) modal.setAttribute("hidden", true);
           currentMediaType === "Video" ? "video" :
           currentMediaType === "Audio" ? "audio" : "image";
 
-        
-        const res = await fetch(`${API_BASE}/scan/${endpoint}`, {
+        const res = await fetch(`${API_BASE}/analyze/${endpoint}`, {
           method: "POST",
           body: form,
         });
-        if (!res.ok) throw new Error(`Request failed: ${res.status}`);
         data = await res.json();
       }
 
-      
-      showResult(data, currentMediaType);
+      showResult(data);
 
     } catch (err) {
       showError("Could not connect to the backend. Make sure the server is running.");
@@ -67,24 +149,20 @@ if (e.target === modal) modal.setAttribute("hidden", true);
   });
 
   // ── Display result ───────────────────────────────────────────────
-  
-  function showResult(data, mediaType) {
-    const riskType = data.risk_type || "critical";
-    const isSafe = riskType === "low" || riskType === "medium";
-    const percent = Math.round(data.trust_score || 0);
+  function showResult(data) {
+    const isSafe   = data.status === "authentic" || data.status === "safe";
+    const percent  = Math.round((data.confidence || 0) * 100);
     const color    = isSafe ? "#16a34a" : "#dc2626";
     const bgColor  = isSafe ? "#f0fdf4" : "#fef2f2";
     const emoji    = isSafe ? "✅" : "🚨";
-    const label = riskType.replace("_", " ").toUpperCase();
+    const label    = data.status?.replace("_", " ").toUpperCase();
 
     // Build details rows
     let detailsHTML = "";
-    
-    const key = (mediaType || "").toLowerCase();
-    const details = data.raw?.[key]?.summary || {};
-    if (details && typeof details === "object") {
-      Object.entries(details).forEach(([key, val]) => {
-        if (typeof val !== "number") return;
+    if (data.details) {
+      const skip = ["detected_keywords"];
+      Object.entries(data.details).forEach(([key, val]) => {
+        if (skip.includes(key)) return;
         const label = key.replace(/_/g, " ");
         const pct   = Math.round(val * 100);
         detailsHTML += `
@@ -99,7 +177,13 @@ if (e.target === modal) modal.setAttribute("hidden", true);
           </div>`;
       });
 
-      
+      // Show detected keywords for text
+      if (data.details.detected_keywords?.length) {
+        const tags = data.details.detected_keywords
+          .map(kw => `<span style="background:#fee2e2;color:#dc2626;padding:2px 8px;border-radius:999px;font-size:12px;margin:2px;display:inline-block;">${kw}</span>`)
+          .join("");
+        detailsHTML += `<div style="margin-top:10px;"><strong>Detected keywords:</strong><br/>${tags}</div>`;
+      }
     }
 
     resultBox.style.cssText = `
@@ -118,10 +202,10 @@ if (e.target === modal) modal.setAttribute("hidden", true);
         <span style="font-size:24px;">${emoji}</span>
         <div>
           <div style="font-size:18px;font-weight:700;color:${color};">${label}</div>
-          <div style="color:#6b7280;">Trust Score: <strong>${percent}%</strong></div>
+          <div style="color:#6b7280;">Confidence: <strong>${percent}%</strong></div>
         </div>
       </div>
-      <p style="color:#374151;margin-bottom:14px;">${data.recommended_action || "No recommendation available."}</p>
+      <p style="color:#374151;margin-bottom:14px;">${data.summary}</p>
       ${detailsHTML}
     `;
   }
@@ -141,4 +225,4 @@ if (e.target === modal) modal.setAttribute("hidden", true);
     `;
     resultBox.innerHTML = `⚠️ ${message}`;
   }
-});     
+});
