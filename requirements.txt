@@ -14,12 +14,12 @@ pillow==10.4.0
 mediapipe==0.10.14
 
 # Optional: required to run Xception deepfake model scoring for videos
-tensorflow==2.17.0
+
 
 # Audio ML model for pretrained Wav2Vec2 voice detection
-torch==2.4.1
-transformers==4.44.2
+
 soundfile==0.12.1
 
 # Your pybind11 module will be built into a .pyd and imported as atrust_native
+
 
