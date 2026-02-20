@@ -1,5 +1,5 @@
-from typing import Dict, Any, List
-from .schemas import TrustReport, EvidenceItem
+from typing import Dict, Any, List␊
+from schemas import TrustReport, EvidenceItem
 
 def _risk_bucket(score: int) -> str:
     if score >= 85: return "low"
@@ -25,21 +25,3 @@ def build_trust_report(results: Dict[str, Any]) -> TrustReport:
         r = results.get(key) or {}
         for ev in r.get("evidence", []):
             evidence.append(EvidenceItem(**ev))
-        flags.extend(r.get("flags", []))
-        penalty += int(r.get("penalty", 0))
-
-    # clamp + compute
-    trust_score = max(0, min(100, 100 - penalty))
-    risk_type = _risk_bucket(trust_score)
-    recommended_action = _action(risk_type)
-
-    # de-dupe flags
-    flags = sorted(set(flags))
-
-    return TrustReport(
-        trust_score=trust_score,
-        risk_type=risk_type, flags=flags,
-        evidence=evidence,
-        recommended_action=recommended_action,
-        raw=results
-    )
