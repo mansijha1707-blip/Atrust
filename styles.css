@@ -8,9 +8,7 @@
 /* Body & Background */
 body {
   font-family: 'Inter', sans-serif;
-  background: linear-gradient(270deg, #0f1b34, #0a1428, #070f1f);
-  background-size: 600% 600%;
-  animation: gradientBG 15s ease infinite;
+  background-color: #0f172a; /* solid dark navy-blue background */
   color: #f1f5f9;
   min-height: 100vh;
 }
