@@ -1,14 +1,40 @@
-<!DOCTYPE html>
-<html lang="en">
+ <!DOCTYPE html>
+ <html lang="en">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+ <head>
+     <meta charset="UTF-8" />
+     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Atrust Dashboard</title>
-    <link rel="stylesheet" href="styles.css" />
+    <title>Atrust - Digital Trust Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+     <link rel="stylesheet" href="styles.css" />
 </head>
+  </head>
+  <body>
+    <!-- Top Navigation -->
+    <header class="site-header">
+      <nav class="navbar" aria-label="Primary navigation">
+        <a class="brand" href="#dashboard" aria-label="Atrust home">
+          <span class="brand-mark" aria-hidden="true">🛡️</span>
+          <span>Atrust</span>
+        </a>
+
+        <button class="nav-toggle" aria-expanded="false" aria-controls="nav-menu" aria-label="Toggle navigation menu">
+          ☰
+        </button>
 
 <body>
+        <ul id="nav-menu" class="nav-links">
+          <li><a href="#dashboard">Dashboard</a></li>
+          <li><a href="#reports">Reports</a></li>
+          <li><a href="#about">About</a></li>
+        </ul>
 
     <header>
         <nav>
@@ -18,13 +44,31 @@
                 <li><a href="#settings">Settings</a></li>
             </ul>
         </nav>
+        <button class="profile-btn" type="button">Profile / Login</button>
+      </nav>
     </header>
 
     <main>
-
-        <!-- Dashboard Section -->
+    <main id="dashboard" class="main-content">
+      <!-- Hero section -->
+      <section class="hero" aria-labelledby="hero-title">
+        <p class="hero-kicker">Cyber Integrity Platform</p>
+        <h1 id="hero-title">Atrust – Real-Time Digital Trust Verification</h1>
+        <p class="hero-subtitle">
+          Detect deepfakes and suspicious media instantly across video, audio, text, and image inputs.
+        </p>
+     </section>
+ 
+       <!-- Dashboard Section -->
         <section id="dashboard">
             <h1>Welcome to Atrust Dashboard</h1>
+      <!-- Primary action cards -->
+      <section class="card-grid" aria-label="Media verification options">
+        <button class="action-card" type="button" data-media="Video">
+          <span class="card-icon" aria-hidden="true">🎬</span>
+          <span class="card-title">Check Video</span>
+          <span class="card-description">Analyze motion and frame-level authenticity.</span>
+        </button>
 
             <div class="card">
                 <h2>Trust Score</h2>
@@ -37,26 +81,82 @@
                 </button>
             </div>
         </section>
+        <button class="action-card" type="button" data-media="Audio">
+          <span class="card-icon" aria-hidden="true">🎧</span>
+          <span class="card-title">Check Audio</span>
+          <span class="card-description">Inspect voice patterns for synthetic artifacts.</span>
+        </button>
 
         <!-- Scores Overview Section -->
         <section id="scores">
             <h2>Trust Scores Overview</h2>
-
+        <button class="action-card" type="button" data-media="Text">
+          <span class="card-icon" aria-hidden="true">📝</span>
+          <span class="card-title">Check Text</span>
+          <span class="card-description">Flag spam, fraud indicators, and generated tone.</span>
+       </button>
+ 
             <div class="card">
                 <p>Overview content will go here...</p>
             </div>
         </section>
-
+        <button class="action-card" type="button" data-media="Image">
+          <span class="card-icon" aria-hidden="true">🖼️</span>
+          <span class="card-title">Check Image</span>
+          <span class="card-description">Detect editing traces and visual inconsistencies.</span>
+        </button>
+      </section>
     </main>
-
-    <!-- Modal -->
+      <!-- Loading placeholder -->
+      <section class="panel" aria-live="polite">
+        <h2>Analysis Status</h2>
+        <div id="loading" class="loading" hidden>
+          <span class="spinner" aria-hidden="true"></span>
+          <p>Scanning media for trust signals...</p>
+        </div>
+        <p id="idleMessage">Select a media type to open upload options and start verification.</p>
+     </section>
+ 
+   <!-- Modal -->
     <div id="modal" class="modal" style="display: none;">
         <div class="modal-content">
             <span class="close" onclick="closeModal()">&times;</span>
+      <!-- Result section -->
+      <section id="reports" class="panel" aria-labelledby="results-title">
+        <h2 id="results-title">Trust Score</h2>
+        <p class="result-meta">Latest sample assessment:</p>
+        <div class="score-row">
+          <span class="score-label">Confidence</span>
+          <span id="scoreValue" class="score-value">78%</span>
+        </div>
+        <div class="progress" role="img" aria-label="Trust score progress bar showing 78 percent confidence">
+          <div id="progressFill" class="progress-fill" style="width: 78%"></div>
+        </div>
+      </section>
 
             <h2>Trust Score Details</h2>
             <p>Detailed breakdown of your trust score...</p>
+      <section id="about" class="panel about-panel">
+        <h2>About Atrust</h2>
+        <p>
+          Atrust provides a clear and actionable verification workflow for digital media, helping teams build confidence in every interaction.
+        </p>
+      </section>
+    </main>
+
+    <!-- Shared upload modal -->
+    <div class="modal" id="uploadModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" hidden>
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 id="modalTitle">Upload File</h2>
+          <button id="closeModal" class="close-btn" type="button" aria-label="Close upload dialog">✕</button>
         </div>
+        <form class="upload-form">
+          <label for="mediaFile">Choose file</label>
+          <input id="mediaFile" name="mediaFile" type="file" />
+          <button type="submit" class="submit-btn">Start Verification</button>
+        </form>
+      </div>
     </div>
 
     <script src="script.js"></script>
@@ -72,4 +172,5 @@
     </script>
 
 </body>
-</html>
+</body>
+ </html>
