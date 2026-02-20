@@ -1,0 +1,15 @@
+fastapi==0.115.0
+uvicorn[standard]==0.30.6
+pydantic==2.8.2
+python-multipart==0.0.9
+
+opencv-python==4.10.0.84
+numpy==2.0.1
+
+# Optional for metadata parsing
+pillow==10.4.0
+
+# MediaPipe is heavy but works on Windows via pip for many setups
+mediapipe==0.10.14
+
+# Your pybind11 module will be built into a .pyd and imported as atrust_native
