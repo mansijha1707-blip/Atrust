@@ -107,7 +107,8 @@ Interactive API docs: **http://127.0.0.1:8000/docs**
 ```
 <img width="1919" height="869" alt="image" src="https://github.com/user-attachments/assets/40867dcc-bb5f-4328-b765-c295dea5f71b" />
 
-<img width="1919" height="872" alt="image" src="https://github.com/user-attachments/assets/85b216f4-ae01-4d7c-9173-9d50ac1b71d1" />
+<img width="1919" height="868" alt="image" src="https://github.com/user-attachments/assets/d7eb2dd0-d7af-45cb-97ac-619bf8e47f20" />
+
 
 
 ---
