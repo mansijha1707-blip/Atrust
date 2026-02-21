@@ -47,11 +47,12 @@ def scan_text(text: str):
             "timestamps": []
         })
 
-    scam_score = min(penalty, 60) / 60.0
+    scam_score = min(penalty, 100) / 100.0
 
     return {
-        "penalty": min(penalty, 60),
+        "penalty": min(penalty, 100),
         "flags": flags,
         "evidence": evidence,
         "summary": {"score": scam_score}
     }
+
