@@ -20,7 +20,7 @@ def scan_video(path: Path, temp_dir: Path) -> dict:
     frames = []
     frame_count = 0
     success = True
-    while success and frame_count < 16:
+    while success and frame_count < 4:
         success, frame = cap.read()
         if success:
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -78,3 +78,4 @@ def scan_video(path: Path, temp_dir: Path) -> dict:
         "evidence": evidence,
         "summary": {"score": score}
     }
+
