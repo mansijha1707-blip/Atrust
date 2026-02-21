@@ -1,4 +1,3 @@
-# video.py
 from pathlib import Path
 import torch
 import torchvision.transforms as transforms
@@ -7,7 +6,6 @@ from PIL import Image
 import cv2
 import numpy as np
 
-# Load pre-trained EfficientNet as proxy for deepfake detection
 video_model = efficientnet_b0(pretrained=True)
 video_model.eval()
 
@@ -22,7 +20,7 @@ def scan_video(path: Path, temp_dir: Path) -> dict:
     frames = []
     frame_count = 0
     success = True
-    while success and frame_count < 16:  # sample up to 16 frames
+    while success and frame_count < 16:
         success, frame = cap.read()
         if success:
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -33,14 +31,16 @@ def scan_video(path: Path, temp_dir: Path) -> dict:
     if not frames:
         score = 0.0
     else:
-        # run each frame through model
         scores = []
         for img in frames:
             x = transform(img).unsqueeze(0)
             with torch.no_grad():
                 out = video_model(x)
                 prob = torch.nn.functional.softmax(out, dim=1)
-                scores.append(prob[0][1].item() if prob.shape[1]>1 else 0.5)
+                # Use entropy as anomaly signal — same as image.py
+                entropy = -float(torch.sum(prob * torch.log(prob + 1e-8)).item())
+                frame_score = min(1.0, entropy / 6.0)
+                scores.append(frame_score)
         score = float(np.mean(scores))
 
     penalty = int(score * 50)
