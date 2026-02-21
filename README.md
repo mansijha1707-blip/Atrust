@@ -48,7 +48,7 @@ uvicorn main:app --reload
 
 **Step 4 — Open the frontend**
 
-Open `index.html` in your browser. That's it!
+Open your browser and go to http://127.0.0.1:8000
 
 ---
 
@@ -67,6 +67,17 @@ Base URL: `http://127.0.0.1:8000`
 | POST | `/scan/unified` | Analyse all modalities at once |
 
 Interactive API docs: **http://127.0.0.1:8000/docs**
+
+---
+
+## 🛠️ Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Backend | Python, FastAPI, Uvicorn |
+| AI/ML | PyTorch, EfficientNet-B0, Wav2Vec2, HuggingFace |
+| Frontend | HTML5, CSS3, Vanilla JavaScript |
+| Other | Pydantic, OpenCV, Librosa, NumPy |
 
 ---
 
