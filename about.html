@@ -10,6 +10,73 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
   <link rel="stylesheet" href="styles.css" />
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      line-height: 1.7;
+      color: #1e293b;
+      margin: 0;
+      padding: 0;
+      /* background-color removed so it matches index.html */
+    }
+    .site-header {
+      background-color: #ffffff;
+      border-bottom: 1px solid #e5e7eb;
+      padding: 1rem 2rem;
+    }
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .brand {
+      font-weight: 700;
+      font-size: 1.5rem;
+      text-decoration: none;
+      color: #1e293b;
+    }
+    .nav-links {
+      list-style: none;
+      display: flex;
+      gap: 1.5rem;
+      margin: 0;
+      padding: 0;
+    }
+    .nav-links a {
+      text-decoration: none;
+      color: #1e293b;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover {
+      color: #2563eb;
+    }
+    .main-content {
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 0 1.5rem;
+    }
+    .hero-kicker {
+      text-transform: uppercase;
+      font-weight: 600;
+      color: #2563eb;
+      margin-bottom: 0.5rem;
+    }
+    h1 {
+      font-size: 2.2rem;
+      margin-bottom: 1rem;
+    }
+    .hero-subtitle {
+      margin-bottom: 1rem;
+      font-size: 1rem;
+    }
+    ul.hero-list {
+      margin-left: 1.5rem;
+      margin-bottom: 1.5rem;
+      padding-left: 0;
+      list-style-type: disc;
+    }
+  </style>
 </head>
 
 <body>
@@ -20,7 +87,6 @@
         <span class="brand-mark">🛡️</span>
         <span>Atrust</span>
       </a>
-
       <ul class="nav-links">
         <li><a href="index.html">Dashboard</a></li>
         <li><a href="reports.html">Reports</a></li>
@@ -42,11 +108,8 @@
         The system analyzes uploaded media using AI‑assisted checks—such as frame analysis, voice anomaly detection, image artifact detection, and NLP‑based scam phrase detection—to generate a clear Trust Score (0–100) along with detailed risk indicators.
       </p>
 
-      <p class="hero-subtitle">
-        Atrust is built to protect users from:
-      </p>
-
-      <ul class="hero-subtitle" style="color: #1e293b; margin-left: 20px; line-height: 1.6;">
+      <p class="hero-subtitle">Atrust protects users from:</p>
+      <ul class="hero-list">
         <li>Impersonation attempts</li>
         <li>AI‑generated misinformation</li>
         <li>UPI/OTP scam messages</li>
